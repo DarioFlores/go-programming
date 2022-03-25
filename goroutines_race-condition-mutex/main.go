@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"runtime"
 	"sync"
 )
 
@@ -11,17 +10,19 @@ func main() {
 	// $ go run -race main.go
 	// $ go run main.go
 	var wg sync.WaitGroup
+	var mutex sync.Mutex
 	incremento := 0
 	gs := 100
 	wg.Add(gs)
 
 	for i := 0; i < gs; i++ {
 		go func() {
+			mutex.Lock()
 			v := incremento
-			runtime.Gosched()
 			v++
 			fmt.Println(fmt.Sprintf("incremento: %d -- v: %d", incremento, v))
 			incremento = v
+			mutex.Unlock()
 			wg.Done()
 		}()
 	}
